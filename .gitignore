@@ -1,0 +1,15 @@
+﻿################################################################################
+# Este arquivo .gitignore foi criado automaticamente pelo Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs
+/src/shared/MotorcycleRentalSystem.Exceptions/bin/Debug/net8.0
+/src/shared/MotorcycleRentalSystem.Exceptions/obj
+/src/Web/MotorcycleRentalSystem.Api/bin/Debug/net8.0
+/src/Web/MotorcycleRentalSystem.Api/obj
+/src/Web/MotorcycleRentalSystem.Application/bin/Debug/net8.0
+/src/Web/MotorcycleRentalSystem.Application/obj
+/src/Web/MotorcycleRentalSystem.Domain/bin/Debug/net8.0
+/src/Web/MotorcycleRentalSystem.Domain/obj
+/src/Web/MotorcycleRentalSystem.Infrastructure/bin/Debug/net8.0
+/src/Web/MotorcycleRentalSystem.Infrastructure/obj
