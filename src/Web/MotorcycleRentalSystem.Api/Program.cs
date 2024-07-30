@@ -14,10 +14,14 @@ using MotorcycleRentalSystem.Application.UseCases.Motorcycles.Update;
 using MotorcycleRentalSystem.Application.UseCases.Deliverymen.Create;
 using MotorcycleRentalSystem.Application.UseCases.Deliverymen.Update;
 using MotorcycleRentalSystem.Application.UseCases.Authorization.Execute;
+using MotorcycleRentalSystem.Infrastructure.Context;
+using Microsoft.EntityFrameworkCore;
+using MotorcycleRentalSystem.Domain.Contracts;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IMotorcycleService, MotorcycleService>();
@@ -36,8 +40,9 @@ builder.Services.AddScoped<ICreateDeliverymenUseCase, CreateDeliverymenUseCase>(
 builder.Services.AddScoped<IUpdateDeliverymenUseCase, UpdateDeliverymenUseCase>();
 builder.Services.AddScoped<IExecuteAuthorizationUseCase, ExecuteAuthorizationUseCase>();
 
-
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
+builder.Services.Configure<ConnectionStrings>(builder.Configuration.GetSection("ConnectionStrings"));
+builder.Services.AddDbContext<AppDbContext>(db => db.UseNpgsql(builder.Configuration.GetConnectionString("PostgresCNS")), ServiceLifetime.Singleton);
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

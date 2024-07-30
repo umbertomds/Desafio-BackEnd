@@ -11,5 +11,5 @@ public interface IUserService
     User? GetByUsername(string username);
     User? GetByCnpj(string cnpj);
     User? GetByLicenseNumber(string number);
-    void AddNewUser(User user);
+    void Add(User user);
 }

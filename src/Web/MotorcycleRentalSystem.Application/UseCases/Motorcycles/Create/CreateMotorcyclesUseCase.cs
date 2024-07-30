@@ -23,7 +23,7 @@ public class CreateMotorcyclesUseCase(IMotorcycleService motorcycleService) : IC
             Model = request.Model,
             LicensePlate = request.LicensePlate
         };
-        _motorcycleService.AddNewMotorcycle(cycle);
+        _motorcycleService.Add(cycle);
         return cycle.Id;
     }
 }

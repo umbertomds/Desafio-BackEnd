@@ -2,7 +2,7 @@
 using MotorcycleRentalSystem.Domain.Enums;
 
 namespace MotorcycleRentalSystem.Domain.Entities;
-public class User : EntityBase
+public class User : UserEntityBase
 {
     public string? Username { get; set; }
     public virtual UserRoleEnum UserRole { get; set; }

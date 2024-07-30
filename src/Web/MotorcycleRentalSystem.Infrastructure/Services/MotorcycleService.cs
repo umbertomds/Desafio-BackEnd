@@ -1,29 +1,33 @@
-﻿using MotorcycleRentalSystem.Domain.Entities;
+﻿using MotorcycleRentalSystem.Domain.Contracts;
+using MotorcycleRentalSystem.Domain.Entities;
 using MotorcycleRentalSystem.Domain.Services;
+using MotorcycleRentalSystem.Infrastructure.Context;
 
 namespace MotorcycleRentalSystem.Infrastructure.Services;
-public class MotorcycleService : IMotorcycleService
+public class MotorcycleService(AppDbContext appDbContext, IUnitOfWork unitOfWork) : IMotorcycleService
 {
-    private long _idCounter = 0;
-    private static readonly List<Motorcycle> _motorcycles = [];
-
-    public void AddNewMotorcycle(Motorcycle motorcycle)
+    private readonly AppDbContext _dbContext = appDbContext;
+    private readonly IUnitOfWork _unitOfWork = unitOfWork;
+    
+    public void Add(Motorcycle motorcycle)
     {
-        motorcycle.Id = getNewId();
-        _motorcycles.Add(motorcycle);
+        _dbContext.Motorcycles.Add(motorcycle);
+        _unitOfWork.Commit();
     }
 
-    public void DeleteMotorcycle(long id)
+    public void Remove(long id)
     {
-        var moto = _motorcycles.FirstOrDefault(x => x.Id == id);
+        var moto = _dbContext.Motorcycles.FirstOrDefault(x => x.Id == id);
         if (moto is not null)
-            _motorcycles.Remove(moto);
+        {
+            _dbContext.Motorcycles.Remove(moto);
+            _unitOfWork.Commit();
+        }
     }
-    public IEnumerable<Motorcycle> GetAll() => _motorcycles;
 
-    public Motorcycle? GetById(long id) => _motorcycles.FirstOrDefault(x => x.Id == id);
+    public IEnumerable<Motorcycle> GetAll() => _dbContext.Motorcycles.AsEnumerable();
 
-    public Motorcycle? GetByLicensePlateNumber(string plateNumber) => _motorcycles.FirstOrDefault(x => x.LicensePlate == plateNumber);
+    public Motorcycle? GetById(long id) => _dbContext.Motorcycles.FirstOrDefault(x => x.Id == id);
 
-    private long getNewId() => ++_idCounter;
+    public Motorcycle? GetByLicensePlateNumber(string plateNumber) => _dbContext.Motorcycles.FirstOrDefault(x => x.LicensePlate == plateNumber);
 }

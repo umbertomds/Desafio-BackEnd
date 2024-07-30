@@ -4,8 +4,6 @@ using MotorcycleRentalSystem.Domain.Requests;
 using MotorcycleRentalSystem.Domain.Responses;
 using MotorcycleRentalSystem.Domain.Services;
 using MotorcycleRentalSystem.Exceptions;
-using System.ComponentModel.DataAnnotations;
-using System.Net.Http;
 
 namespace MotorcycleRentalSystem.Application.UseCases.RentOrders.Create;
 
@@ -35,7 +33,7 @@ public class CreateRentOrdersUseCase(
             EndAt = begin.AddDays((int)request.PlanPeriod - 1),
             TotalCost = plan.TotalCost
         };
-        _rentOrderService.AddOrder(order);
+        _rentOrderService.Add(order);
         return new(order.Id);
     }
 

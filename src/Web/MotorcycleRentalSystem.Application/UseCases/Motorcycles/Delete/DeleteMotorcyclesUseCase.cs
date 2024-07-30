@@ -10,7 +10,7 @@ public class DeleteMotorcyclesUseCase(IMotorcycleService motorcycleService) : ID
     {
         var cycle = _motorcycleService.GetById(id);
         Validate(id, cycle);
-        _motorcycleService.DeleteMotorcycle(id);
+        _motorcycleService.Remove(id);
     }
 
     private void Validate(long id, Motorcycle? cycle)

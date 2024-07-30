@@ -23,7 +23,7 @@ public class CreateDeliverymenUseCase(IUserService userService) : ICreateDeliver
         user.DriverLicense.Number = request.DriverLicenseNumber;
         user.DriverLicense.Type = request.DriverLicenseType;
         user.DriverLicense.Picture = request.DriverLicensePicture;
-        _userService.AddNewUser(user);
+        _userService.Add(user);
 
         return user.Id;
     }

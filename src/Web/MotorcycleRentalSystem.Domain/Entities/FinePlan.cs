@@ -1,7 +1,7 @@
 ﻿using MotorcycleRentalSystem.Domain.Enums;
 
 namespace MotorcycleRentalSystem.Domain.Entities;
-public class FinePlan
+public class FinePlan : OrdinaryEntityBase
 {
     public PlanFineTypeEnum FineType { get; set; }
     public int Days { get; set; }

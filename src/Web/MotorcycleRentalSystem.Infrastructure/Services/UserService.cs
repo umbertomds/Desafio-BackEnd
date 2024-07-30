@@ -4,26 +4,22 @@ using MotorcycleRentalSystem.Domain.Responses;
 using MotorcycleRentalSystem.Domain.Requests;
 using MotorcycleRentalSystem.Domain.Entities;
 using MotorcycleRentalSystem.Domain.Services;
+using MotorcycleRentalSystem.Domain.Contracts;
+using MotorcycleRentalSystem.Infrastructure.Context;
 
 namespace MotorcycleRentalSystem.Infrastructure.Services;
-public class UserService(ITokenService tokenService, IOptions<AppSettings> appSettings) : IUserService
+public class UserService(ITokenService tokenService, AppDbContext appDbContext, IUnitOfWork unitOfWork, IOptions<AppSettings> appSettings) : IUserService
 {
-    private long _idCounter = 0;
-    private static List<User> _users =
-    [
-        new AdminUser()
-        { 
-            Id = 1, Name = "Tester admin", Username = "test", Password = "test" 
-        }
-    ];
-
-    private readonly ITokenService _tokenService = tokenService;
+    private readonly AppDbContext _dbContext = appDbContext;
     private readonly AppSettings _appSettings = appSettings.Value;
+    private readonly ITokenService _tokenService = tokenService;
+    private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
     public AuthenticateResponse? Authenticate(AuthenticateRequest model)
     {
         var secret = _appSettings.JwtAuthentication!.Secret ?? "";
-        var user = _users.SingleOrDefault(x => x.Username == model.Username && x.Password == model.Password);
+        var sw = _dbContext.AdminUsers.ToList();
+        var user = _dbContext.Users.SingleOrDefault(x => x.Username == model.Username && x.Password == model.Password);
         if (user == null) 
             return null;
 
@@ -31,21 +27,18 @@ public class UserService(ITokenService tokenService, IOptions<AppSettings> appSe
         return new AuthenticateResponse(user, token);
     }
 
-    public IEnumerable<User> GetAll() => _users;
+    public IEnumerable<User> GetAll() => _dbContext.Users.AsEnumerable();
 
-    public User? GetById(long id) => _users.FirstOrDefault(x => x.Id == id);
+    public User? GetById(long id) => _dbContext.Users.FirstOrDefault(x => x.Id == id);
 
-    public void AddNewUser(User user)
+    public void Add(User user)
     {
-        user.Id = getNewId();
-        _users.Add(user);
+        _dbContext.Add(user);
+        _unitOfWork.Commit();
     }
 
-    public User? GetByUsername(string username) => _users.FirstOrDefault(x => x.Username == username);
-    public User? GetByCnpj(string cnpj) => _users.OfType<DeliverymanUser>().FirstOrDefault(x => x.Cnpj == cnpj);
-    public User? GetByLicenseNumber(string number) => _users.OfType<DeliverymanUser>().FirstOrDefault(x => x.DriverLicense?.Number == number);
-
-    private long getNewId() => ++_idCounter;
-
+    public User? GetByUsername(string username) => _dbContext.Users.FirstOrDefault(x => x.Username == username);
+    public User? GetByCnpj(string cnpj) => _dbContext.Users.OfType<DeliverymanUser>().FirstOrDefault(x => x.Cnpj == cnpj);
+    public User? GetByLicenseNumber(string number) => _dbContext.Users.OfType<DeliverymanUser>().FirstOrDefault(x => x.DriverLicense.Number == number);
 }
 

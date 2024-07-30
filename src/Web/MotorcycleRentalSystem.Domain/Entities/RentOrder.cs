@@ -1,7 +1,8 @@
 ﻿using MotorcycleRentalSystem.Domain.Enums;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MotorcycleRentalSystem.Domain.Entities;
-public class RentOrder : EntityBase
+public class RentOrder : OrdinaryEntityBase
 {
     public DeliverymanUser? Deliveryman { get; set; }
     public Motorcycle? Motorcycle { get; set; }
@@ -12,6 +13,7 @@ public class RentOrder : EntityBase
     public DateTime EndAt { get; set; }
     public decimal TotalCost { get; set; }
 
+    [NotMapped]
     public RentOrderStateEnum State =>
         EndAt > DateTime.MinValue ?
         RentOrderStateEnum.Finished :
