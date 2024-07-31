@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MotorcycleRentalSystem.Domain.Services;
-using MotorcycleRentalSystem.Domain.Requests;
-using MotorcycleRentalSystem.Domain.Responses;
+using MotorcycleRentalSystem.DTO.Requests;
+using MotorcycleRentalSystem.DTO.Responses;
 using MotorcycleRentalSystem.Application.UseCases.Authorization.Execute;
 using MotorcycleRentalSystem.Exceptions;
 

@@ -1,7 +1,7 @@
-﻿using MotorcycleRentalSystem.Domain.Requests;
+﻿using MotorcycleRentalSystem.DTO.Requests;
 
 namespace MotorcycleRentalSystem.Application.UseCases.RentOrders.Update;
 public interface IUpdateRentOrdersUseCase
 {
-    void Execute(UpdateOrderRequest request, long id, long userId);
+    Task Execute(UpdateOrderRequest request, long id, long userId);
 }

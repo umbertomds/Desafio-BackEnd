@@ -1,20 +1,21 @@
 ﻿using Microsoft.Extensions.Options;
 using MotorcycleRentalSystem.Domain.Entities;
 using MotorcycleRentalSystem.Domain.Enums;
+using MotorcycleRentalSystem.Domain.Mappings.Out;
 using MotorcycleRentalSystem.Domain.Options;
-using MotorcycleRentalSystem.Domain.Responses;
-using MotorcycleRentalSystem.Domain.Services;
+using MotorcycleRentalSystem.DTO.Responses;
 using MotorcycleRentalSystem.Exceptions;
+using MotorcycleRentalSystem.Domain.Repositories;
 
 namespace MotorcycleRentalSystem.Application.UseCases.Motorcycles.Read;
 
-public class ReadMotorcyclesUseCase(IMotorcycleService motorcycleService, IOptions<AppSettings> appSettings) : IReadMotorcyclesUseCase
+public class ReadMotorcyclesUseCase(IMotorcycleRepository motorcycleRepository, IOptions<AppSettings> appSettings) : IReadMotorcyclesUseCase
 {
-    private readonly IMotorcycleService _motorcycleService = motorcycleService;
+    private readonly IMotorcycleRepository _motorcycleRepository = motorcycleRepository;
     private readonly AppSettings _appSettings = appSettings.Value;
 
     private int QUANTITY_MAX => _appSettings.WideQueries?.MotorcyclesMaxEntries ?? 100;
-    public GetMotorcyclesResponse Execute(UserRoleEnum role, int offset, int quantity, AvailabilityFilterEnum availabilityFilter)
+    public async Task<GetMotorcyclesResponse> Execute(UserRoleEnum role, int offset, int quantity, AvailabilityFilterEnum availabilityFilter)
     {
         string filter = "";
 
@@ -23,44 +24,44 @@ public class ReadMotorcyclesUseCase(IMotorcycleService motorcycleService, IOptio
         if (quantity <= 0 || quantity > QUANTITY_MAX)
             quantity = QUANTITY_MAX;
 
-        var results = _motorcycleService.GetAll();
+        var results = await _motorcycleRepository.GetAll();
 
         if (role == UserRoleEnum.RegularRole)
             availabilityFilter = AvailabilityFilterEnum.OnlyAvailable;
 
         if (availabilityFilter == AvailabilityFilterEnum.OnlyAvailable)
         {
-            results = results.Where(x => x.IsLastOrderActive);
+            results = results.Where(x => x.IsLastOrderActive).ToList();
             filter = "only available ones";
         }
         else if (availabilityFilter == AvailabilityFilterEnum.OnlyUnavailable)
         {
-            results = results.Where(x => !x.IsLastOrderActive);
+            results = results.Where(x => !x.IsLastOrderActive).ToList();
             filter = "only unavailable ones";
         }
-        var resultsAfterSkip = _motorcycleService.GetAll().Skip(offset);
+        var resultsAfterSkip = (await _motorcycleRepository.GetAll()).Skip(offset);
         var result = resultsAfterSkip.Take(quantity);
         var remaining = resultsAfterSkip.Count() - quantity;
         if (remaining < 0)
             remaining = 0;
-        return new GetMotorcyclesResponse(result, remaining, offset, quantity, filter);
+        return new GetMotorcyclesResponseMapper().Map(result, remaining, offset, quantity, filter);
     }
 
-    public GetSelectedMotorcycleResponse Execute(long id) => Execute(id, "");
-    public GetSelectedMotorcycleResponse Execute(string licensePlate) => Execute(0, licensePlate);
-    private GetSelectedMotorcycleResponse Execute(long id = 0, string licensePlate = "")
+    public async Task<GetSelectedMotorcycleResponse> Execute(long id) => await Execute(id, "");
+    public async Task<GetSelectedMotorcycleResponse> Execute(string licensePlate) => await Execute(0, licensePlate);
+    private async Task<GetSelectedMotorcycleResponse> Execute(long id = 0, string licensePlate = "")
     {
         Motorcycle? cycle = null;
         if (id != 0)
-            cycle = _motorcycleService.GetById(id);
+            cycle = await _motorcycleRepository.GetById(id);
         else
-            cycle = _motorcycleService.GetByLicensePlateNumber(licensePlate);
+            cycle = await _motorcycleRepository.GetByLicensePlateNumber(licensePlate);
 
         if (cycle is null)
             throw new EntityNotFoundException(
                 "The requested vehicle was not found.",
                 typeof(Motorcycle), id
             );
-        return new GetSelectedMotorcycleResponse("", cycle);
+        return new GetSelectedMotorcycleResponseMapper().Map("", cycle);
     }
 }

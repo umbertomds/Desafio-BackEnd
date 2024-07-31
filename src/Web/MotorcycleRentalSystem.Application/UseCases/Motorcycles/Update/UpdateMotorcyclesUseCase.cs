@@ -1,16 +1,17 @@
-﻿using MotorcycleRentalSystem.Domain.Entities;
-using MotorcycleRentalSystem.Domain.Requests;
+﻿using MotorcycleRentalSystem.DTO.Requests;
+using MotorcycleRentalSystem.Domain.Entities;
 using MotorcycleRentalSystem.Domain.Services;
 using MotorcycleRentalSystem.Exceptions;
+using MotorcycleRentalSystem.Domain.Repositories;
 
 namespace MotorcycleRentalSystem.Application.UseCases.Motorcycles.Update;
 
-public class UpdateMotorcyclesUseCase(IMotorcycleService motorcycleService) : IUpdateMotorcyclesUseCase
+public class UpdateMotorcyclesUseCase(IMotorcycleRepository motorcycleRepository) : IUpdateMotorcyclesUseCase
 {
-    private readonly IMotorcycleService _motorcycleService = motorcycleService;
-    public void Execute(UpdateLicensePlateRequest request, long id)
+    private readonly IMotorcycleRepository _motorcycleRepository = motorcycleRepository;
+    public async Task Execute(UpdateLicensePlateRequest request, long id)
     {
-        var cycle = _motorcycleService.GetById(id);
+        var cycle = await _motorcycleRepository.GetById(id);
         Validate(id, cycle, request);
         cycle!.LicensePlate = request.NewLicensePlate;
     }
@@ -29,7 +30,7 @@ public class UpdateMotorcyclesUseCase(IMotorcycleService motorcycleService) : IU
                 "NewLicensePlate", request.NewLicensePlate!
             );
 
-        if (_motorcycleService.GetByLicensePlateNumber(request.NewLicensePlate!) is not null)
+        if (_motorcycleRepository.GetByLicensePlateNumber(request.NewLicensePlate!) is not null)
             throw new FieldValidationFaultException(
                "The informed license plate number is alredy in use by another vehicle.",
                "NewLicensePlate", request.NewLicensePlate!

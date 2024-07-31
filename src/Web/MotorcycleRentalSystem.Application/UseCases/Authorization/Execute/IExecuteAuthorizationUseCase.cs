@@ -1,8 +1,8 @@
-﻿using MotorcycleRentalSystem.Domain.Requests;
-using MotorcycleRentalSystem.Domain.Responses;
+﻿using MotorcycleRentalSystem.DTO.Requests;
+using MotorcycleRentalSystem.DTO.Responses;
 
 namespace MotorcycleRentalSystem.Application.UseCases.Authorization.Execute;
 public interface IExecuteAuthorizationUseCase
 {
-    Task<AuthenticateResponse>  Execute(AuthenticateRequest request);
+    Task<AuthenticateResponse> Execute(AuthenticateRequest request);
 }

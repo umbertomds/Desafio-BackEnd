@@ -1,5 +1,5 @@
 ﻿using MotorcycleRentalSystem.Domain.Enums;
-using MotorcycleRentalSystem.Domain.Responses;
+using MotorcycleRentalSystem.DTO.Responses;
 
 namespace MotorcycleRentalSystem.Application.UseCases.RentQuotes.Read;
 public interface IReadRentQuotesUseCase

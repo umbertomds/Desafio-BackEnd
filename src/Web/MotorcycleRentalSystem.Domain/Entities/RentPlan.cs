@@ -1,7 +1,10 @@
 ﻿using MotorcycleRentalSystem.Domain.Enums;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MotorcycleRentalSystem.Domain.Entities;
-public class RentPlan : OrdinaryEntityBase
+
+[ComplexType]
+public class RentPlan
 {
     public RentalPlanPeriodEnum PlanPeriod { get; set; }
     public decimal PerDayCost { get; set; }

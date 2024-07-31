@@ -7,10 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.7" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.2" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\shared\MotorcycleRentalSystem.DTO\MotorcycleRentalSystem.DTO.csproj" />
     <ProjectReference Include="..\..\shared\MotorcycleRentalSystem.Exceptions\MotorcycleRentalSystem.Exceptions.csproj" />
     <ProjectReference Include="..\MotorcycleRentalSystem.Domain\MotorcycleRentalSystem.Domain.csproj" />
   </ItemGroup>

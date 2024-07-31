@@ -1,7 +1,7 @@
-﻿using MotorcycleRentalSystem.Domain.Requests;
+﻿using MotorcycleRentalSystem.DTO.Requests;
 
 namespace MotorcycleRentalSystem.Application.UseCases.Deliverymen.Create;
 public interface ICreateDeliverymenUseCase
 {
-    long Execute(NewDeliverymanUserRequest request);
+    Task<long> Execute(NewDeliverymanUserRequest request);
 }

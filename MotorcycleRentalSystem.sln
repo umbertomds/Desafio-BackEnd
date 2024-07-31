@@ -19,6 +19,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shared", "shared", "{B88768
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MotorcycleRentalSystem.Exceptions", "src\shared\MotorcycleRentalSystem.Exceptions\MotorcycleRentalSystem.Exceptions.csproj", "{64C0E022-2E86-40A8-9F05-A8DB11A51D9F}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MotorcycleRentalSystem.DTO", "src\shared\MotorcycleRentalSystem.DTO\MotorcycleRentalSystem.DTO.csproj", "{DB6B04A9-AEF3-4F69-9828-BF3F051F48D6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{64C0E022-2E86-40A8-9F05-A8DB11A51D9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{64C0E022-2E86-40A8-9F05-A8DB11A51D9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{64C0E022-2E86-40A8-9F05-A8DB11A51D9F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB6B04A9-AEF3-4F69-9828-BF3F051F48D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB6B04A9-AEF3-4F69-9828-BF3F051F48D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB6B04A9-AEF3-4F69-9828-BF3F051F48D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB6B04A9-AEF3-4F69-9828-BF3F051F48D6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -57,6 +63,7 @@ Global
 		{BEA8881D-54E0-4485-9CD8-5B4573AEE07D} = {51F16C98-2E06-480B-8C4A-ED9B3A97FAF5}
 		{B887687D-61C4-4685-AABB-81151293BE83} = {51F16C98-2E06-480B-8C4A-ED9B3A97FAF5}
 		{64C0E022-2E86-40A8-9F05-A8DB11A51D9F} = {B887687D-61C4-4685-AABB-81151293BE83}
+		{DB6B04A9-AEF3-4F69-9828-BF3F051F48D6} = {B887687D-61C4-4685-AABB-81151293BE83}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {252B1E4B-B259-47E1-82DC-8332A6759A12}

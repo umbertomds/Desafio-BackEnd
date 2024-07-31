@@ -1,8 +1,8 @@
-﻿using MotorcycleRentalSystem.Domain.Requests;
-using MotorcycleRentalSystem.Domain.Responses;
+﻿using MotorcycleRentalSystem.DTO.Requests;
+using MotorcycleRentalSystem.DTO.Responses;
 
 namespace MotorcycleRentalSystem.Application.UseCases.RentOrders.Create;
 public interface ICreateRentOrdersUseCase
 {
-    CreatedResponse Execute(long id, NewRentOrderRequest request);
+    Task<CreatedResponse> Execute(long id, NewRentOrderRequest request);
 }

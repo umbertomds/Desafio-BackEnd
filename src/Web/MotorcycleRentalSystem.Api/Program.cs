@@ -17,17 +17,25 @@ using MotorcycleRentalSystem.Application.UseCases.Authorization.Execute;
 using MotorcycleRentalSystem.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using MotorcycleRentalSystem.Domain.Contracts;
+using MotorcycleRentalSystem.Infrastructure.Repositories;
+using MotorcycleRentalSystem.Domain.Repositories;
+using Microsoft.AspNetCore.Identity;
+using MotorcycleRentalSystem.Domain.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Add services to the container
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ITokenService, TokenService>();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IMotorcycleService, MotorcycleService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IRentQuoteService, RentQuoteService>();
-builder.Services.AddScoped<IRentOrderService, RentOrderService>();
 
+// Add repositories
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IMotorcycleRepository, MotorcycleRepository>();
+builder.Services.AddScoped<IRentOrderRepository, RentOrderRepository>();
+
+// Add usecases
 builder.Services.AddScoped<IReadRentQuotesUseCase, ReadRentQuotesUseCase>();
 builder.Services.AddScoped<IReadRentOrdersUseCase, ReadRentOrdersUseCase>();
 builder.Services.AddScoped<ICreateRentOrdersUseCase, CreateRentOrdersUseCase>();
@@ -40,9 +48,15 @@ builder.Services.AddScoped<ICreateDeliverymenUseCase, CreateDeliverymenUseCase>(
 builder.Services.AddScoped<IUpdateDeliverymenUseCase, UpdateDeliverymenUseCase>();
 builder.Services.AddScoped<IExecuteAuthorizationUseCase, ExecuteAuthorizationUseCase>();
 
+// Add configuration objects
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 builder.Services.Configure<ConnectionStrings>(builder.Configuration.GetSection("ConnectionStrings"));
-builder.Services.AddDbContext<AppDbContext>(db => db.UseNpgsql(builder.Configuration.GetConnectionString("PostgresCNS")), ServiceLifetime.Singleton);
+
+// Add password hasher provider
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+
+// Add Postgres EF provider
+builder.Services.AddDbContext<AppDbContext>(db =>  db.UseNpgsql(builder.Configuration.GetConnectionString("PostgresCNS")), ServiceLifetime.Singleton);
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

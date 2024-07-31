@@ -1,18 +1,21 @@
-﻿using MotorcycleRentalSystem.Domain.Requests;
-using MotorcycleRentalSystem.Domain.Responses;
-using MotorcycleRentalSystem.Domain.Services;
+﻿using MotorcycleRentalSystem.DTO.Requests;
+using MotorcycleRentalSystem.DTO.Responses;
 using MotorcycleRentalSystem.Exceptions;
+using MotorcycleRentalSystem.Domain.Services;
+using Microsoft.AspNetCore.Identity;
+using MotorcycleRentalSystem.Domain.Entities;
 
 namespace MotorcycleRentalSystem.Application.UseCases.Authorization.Execute;
 
-public class ExecuteAuthorizationUseCase(IUserService userService) : IExecuteAuthorizationUseCase
+public class ExecuteAuthorizationUseCase(IAuthService authService) : IExecuteAuthorizationUseCase
 {
-    private readonly IUserService _userService = userService;
+    private readonly IAuthService _authService = authService;
     public async Task<AuthenticateResponse> Execute(AuthenticateRequest request)
     {
-        return await Task.Run(() => {
-            var response = _userService.Authenticate(request);
-            return response is null ? throw new AuthenticationFailedException() : response;
-        });
+
+        var ws = new PasswordHasher<User>();
+        
+        var response = await _authService.Authenticate(request);
+        return response is null ? throw new AuthenticationFailedException() : response;
     }
 }

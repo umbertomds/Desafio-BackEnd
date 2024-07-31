@@ -1,39 +1,43 @@
-﻿using MotorcycleRentalSystem.Domain.Entities;
+﻿using MotorcycleRentalSystem.DTO.Requests;
+using MotorcycleRentalSystem.Domain.Entities;
 using MotorcycleRentalSystem.Domain.Enums;
-using MotorcycleRentalSystem.Domain.Requests;
-using MotorcycleRentalSystem.Domain.Responses;
+using MotorcycleRentalSystem.Domain.Mappings.In;
+using MotorcycleRentalSystem.DTO.Responses;
 using MotorcycleRentalSystem.Domain.Services;
 using MotorcycleRentalSystem.Exceptions;
+using MotorcycleRentalSystem.Domain.Repositories;
+using MotorcycleRentalSystem.Domain.Helpers;
 
 namespace MotorcycleRentalSystem.Application.UseCases.RentOrders.Create;
 
 public class CreateRentOrdersUseCase(
-    IUserService userService, IMotorcycleService motorcycleService, 
-    IRentQuoteService rentQuoteService, IRentOrderService rentOrderService) : ICreateRentOrdersUseCase
+    IUserRepository userRepository, IMotorcycleRepository motorcycleRepository, 
+    IRentQuoteService rentQuoteService, IRentOrderRepository rentOrderRepository) : ICreateRentOrdersUseCase
 {
-    private readonly IUserService _userService = userService;
-    private readonly IMotorcycleService _motorcycleService = motorcycleService;
+    private readonly ToRentalPlanPeriodEnum rentalPlanPeriodEnum = new();
+    private readonly IUserRepository _userRepository = userRepository;
+    private readonly IMotorcycleRepository _motorcycleRepository = motorcycleRepository;
     private readonly IRentQuoteService _rentQuoteService = rentQuoteService;
-    private readonly IRentOrderService _rentOrderService = rentOrderService;
+    private readonly IRentOrderRepository _rentOrderRepository = rentOrderRepository;
 
-    public CreatedResponse Execute(long id, NewRentOrderRequest request)
+    public async Task<CreatedResponse> Execute(long id, NewRentOrderRequest request)
     {
-        var cycle = _motorcycleService.GetById(request.MotorcycleId);
-        var user = _userService.GetById(id) as DeliverymanUser;
-        var begin = DateTime.Today.AddDays(1);
+        var cycle = await _motorcycleRepository.GetById(request.MotorcycleId);
+        var user = await _userRepository.GetById(id) as DeliverymanUser;
+        var begin = DateUtcHelper.Today().AddDays(1);
         Validate(user!, cycle, request);
 
-        var plan = _rentQuoteService.EstimatePlan(request.PlanPeriod);
+        var plan = _rentQuoteService.EstimatePlan(rentalPlanPeriodEnum.Convert(request.PlanPeriod));
         RentOrder order = new()
         {
             Deliveryman = user,
-            Motorcycle = _motorcycleService.GetById(request.MotorcycleId),
+            Motorcycle = await _motorcycleRepository.GetById(request.MotorcycleId),
             RentPlan = plan,
             BeginAt = begin,
-            EndAt = begin.AddDays((int)request.PlanPeriod - 1),
-            TotalCost = plan.TotalCost
+            EstimatedEndAt = begin.AddDays((int)request.PlanPeriod - 1),
+            TotalCost = plan.TotalCost,
         };
-        _rentOrderService.Add(order);
+        await _rentOrderRepository.Add(order);
         return new(order.Id);
     }
 
@@ -46,6 +50,17 @@ public class CreateRentOrdersUseCase(
                 "The rent should be finished in order to proceed with a new rent order."
             );
 
+        LicenseTypeEnum[] allowedLicenses = [
+            LicenseTypeEnum.TypeA,
+            LicenseTypeEnum.TypeAB
+        ];
+        if (!allowedLicenses.Contains(user!.DriverLicense.Type))
+            throw new BusinessLogicValidationFaultException(
+                "Cannot proceed with the request: " +
+                "The active user's driver license type doesn't allow him to " +
+                "rent motorcycles."
+            );
+
         if (cycle is null)
             throw new FieldValidationFaultException(
                 "The requested motorcycle was not found. Pick another one.",
@@ -53,7 +68,9 @@ public class CreateRentOrdersUseCase(
                 request.MotorcycleId.ToString()
             );
 
-        if (!Enum.GetValues<RentalPlanPeriodEnum>().Contains(request.PlanPeriod))
+        if (!Enum.GetValues<RentalPlanPeriodEnum>().Contains(
+            rentalPlanPeriodEnum.Convert(request.PlanPeriod))
+        )
             throw new FieldValidationFaultException(
                 "The requested plan period was not found. Pick another one.",
                 "PlanPeriod",

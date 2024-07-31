@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using MotorcycleRentalSystem.Domain.Options;
+using MotorcycleRentalSystem.Domain.Repositories;
 using MotorcycleRentalSystem.Domain.Services;
 using System.IdentityModel.Tokens.Jwt;
 
@@ -11,7 +12,7 @@ public class JwtMiddleware(RequestDelegate next, IOptions<AppSettings> appSettin
     private readonly AppSettings _appSettings = appSettings.Value;
     private ITokenService? _tokenService = null;
 
-    public async Task Invoke(HttpContext context, IUserService userService)
+    public async Task Invoke(HttpContext context, IUserRepository userRepository)
     {
         _tokenService = context.RequestServices.GetService<ITokenService>();
         
@@ -38,12 +39,12 @@ public class JwtMiddleware(RequestDelegate next, IOptions<AppSettings> appSettin
 
         var token = splittedBearer[1];
         if (token is not null)
-            attachUserToContext(context, userService, token);
+            await attachUserToContext(context, userRepository, token);
 
         await _next(context);
     }
 
-    private void attachUserToContext(HttpContext context, IUserService userService, string token)
+    private async Task attachUserToContext(HttpContext context, IUserRepository userRepository, string token)
     {
         try
         {
@@ -54,7 +55,7 @@ public class JwtMiddleware(RequestDelegate next, IOptions<AppSettings> appSettin
             var jwtToken = _tokenService.GetDecodedJwtToken(token, secret) as JwtSecurityToken;
             var userId = long.Parse(jwtToken!.Claims.First(x => x.Type == "id").Value);
 
-            context.Items["User"] = userService.GetById(userId);
+            context.Items["User"] = await userRepository.GetById(userId);
         }
         catch
         {

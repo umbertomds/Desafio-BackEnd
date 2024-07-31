@@ -1,15 +1,15 @@
 ﻿using MotorcycleRentalSystem.Domain.Enums;
-using MotorcycleRentalSystem.Domain.Responses;
+using MotorcycleRentalSystem.Domain.Mappings.Out;
+using MotorcycleRentalSystem.DTO.Responses;
 using MotorcycleRentalSystem.Domain.Services;
 using MotorcycleRentalSystem.Exceptions;
-using System.Net.Http;
-using System.Numerics;
+using MotorcycleRentalSystem.Domain.Repositories;
 
 namespace MotorcycleRentalSystem.Application.UseCases.RentQuotes.Read;
 
-public class ReadRentQuotesUseCase(IUserService userService, IRentQuoteService rentQuoteService) : IReadRentQuotesUseCase
+public class ReadRentQuotesUseCase(IUserRepository userRepository, IRentQuoteService rentQuoteService) : IReadRentQuotesUseCase
 {
-    private readonly IUserService _userService = userService;
+    private readonly IUserRepository _userRepository = userRepository;
     private readonly IRentQuoteService _rentQuoteService = rentQuoteService;
 
     public GetPlansResponse Execute()
@@ -17,7 +17,7 @@ public class ReadRentQuotesUseCase(IUserService userService, IRentQuoteService r
         Dictionary<string, int> pairs = [];
         foreach (var value in Enum.GetValues<RentalPlanPeriodEnum>().Where(x => x != RentalPlanPeriodEnum.None))
             pairs.Add(NormatizeName(Enum.GetName(value)), (int)value);
-        return new (pairs);
+        return new GetPlansResponseMapper().Map(pairs);
     }
 
     public CalculatePlanResponse Execute(RentalPlanPeriodEnum plan)
@@ -27,7 +27,7 @@ public class ReadRentQuotesUseCase(IUserService userService, IRentQuoteService r
                 "The requested plan was not found.", typeof(RentalPlanPeriodEnum), (long)plan
             );
 
-        return new CalculatePlanResponse() { RentPlan = _rentQuoteService.EstimatePlan(plan) };
+        return new CalculatePlanResponseMapper().Map(_rentQuoteService.EstimatePlan(plan));
     }
     public CalculateFineResponse Execute(RentalPlanPeriodEnum planPeriod, DateTime estimated, DateTime actually)
     {
@@ -37,11 +37,7 @@ public class ReadRentQuotesUseCase(IUserService userService, IRentQuoteService r
             );
 
         var finePlan = _rentQuoteService.EstimatePlanFine(planPeriod, estimated, actually);
-        return new CalculateFineResponse()
-        {
-            FinePlan = finePlan,
-            FineDescription = GetFineDescription(finePlan.FineType)
-        };
+        return new CalculateFineResponseMapper().Map(finePlan, GetFineDescription(finePlan.FineType));
     }
 
     private static string NormatizeName(string? name)

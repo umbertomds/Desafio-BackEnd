@@ -1,11 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using MotorcycleRentalSystem.DTO.Requests;
 using MotorcycleRentalSystem.Api.Attributes;
-using MotorcycleRentalSystem.Domain.Services;
-using MotorcycleRentalSystem.Domain.Requests;
 using MotorcycleRentalSystem.Domain.Entities;
-using MotorcycleRentalSystem.Domain.Responses;
-using Microsoft.Extensions.Options;
-using MotorcycleRentalSystem.Domain.Options;
+using MotorcycleRentalSystem.DTO.Responses;
 using MotorcycleRentalSystem.Application.UseCases.RentOrders.Create;
 using MotorcycleRentalSystem.Exceptions;
 using MotorcycleRentalSystem.Application.UseCases.RentOrders.Update;
@@ -20,25 +17,25 @@ public class RentOrdersController : ControllerBase
     [Authorize]
     [HttpGet]
     [ProducesResponseType(typeof(GetOrdersResponse), StatusCodes.Status200OK)]
-    public IActionResult Get(
+    public async Task<IActionResult> Get(
         [FromServices] IReadRentOrdersUseCase useCase, [FromQuery] int offset, [FromQuery] int quantity
     )
     {
         var user = HttpContext.Items["User"] as User;
-        return Ok(useCase.Execute(user!.UserRole, user!.Id, offset, quantity));
+        return Ok(await useCase.Execute(user!.UserRole, user!.Id, offset, quantity));
     }
 
     [AdminAuth]
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(GetSelectedOrderResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(NotFoundResponse), StatusCodes.Status404NotFound)]
-    public IActionResult GetById([FromServices] IReadRentOrdersUseCase useCase, [FromRoute] long id)
+    public async Task<IActionResult> GetById([FromServices] IReadRentOrdersUseCase useCase, [FromRoute] long id)
     {
         var path = HttpContext.Request.Path;
         GetSelectedOrderResponse? response = null;
         try
         {
-            response = useCase.Execute(id);
+            response = await useCase.Execute(id);
             response.Path = path;
         }
         catch (EntityNotFoundException e)
@@ -50,16 +47,16 @@ public class RentOrdersController : ControllerBase
 
     [RegularAuth]
     [HttpPost]
-    [ProducesResponseType(typeof(CreatedResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(CreatedResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(BadRequestResponse), StatusCodes.Status400BadRequest)]
-    public IActionResult RegisterNew([FromServices] ICreateRentOrdersUseCase useCase, [FromBody] NewRentOrderRequest request)
+    public async Task<IActionResult> RegisterNew([FromServices] ICreateRentOrdersUseCase useCase, [FromBody] NewRentOrderRequest request)
     {
         CreatedResponse? response = null;
         var path = HttpContext.Request.Path;
         var user = HttpContext.Items["User"] as User;
         try
         {
-            response = useCase.Execute(user!.Id, request);
+            response = await useCase.Execute(user!.Id, request);
         }
         catch (BusinessLogicValidationFaultException e)
         {
@@ -77,7 +74,7 @@ public class RentOrdersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(NotFoundResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(BadRequestResponse), StatusCodes.Status400BadRequest)]
-    public IActionResult UpdateOrder(
+    public async Task<IActionResult> UpdateOrder(
         [FromServices] IUpdateRentOrdersUseCase useCase, [FromBody] UpdateOrderRequest request, 
         [FromQuery] long id
     )
@@ -86,7 +83,7 @@ public class RentOrdersController : ControllerBase
         var user = HttpContext.Items["User"] as User;
         try
         {
-            useCase.Execute(request, id, user!.Id);
+            await useCase.Execute(request, id, user!.Id);
         }
         catch (EntityNotFoundException e)
         {

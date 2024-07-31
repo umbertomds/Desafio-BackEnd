@@ -1,25 +1,26 @@
 ﻿using Microsoft.Extensions.Options;
 using MotorcycleRentalSystem.Domain.Entities;
 using MotorcycleRentalSystem.Domain.Enums;
+using MotorcycleRentalSystem.Domain.Mappings.Out;
 using MotorcycleRentalSystem.Domain.Options;
-using MotorcycleRentalSystem.Domain.Responses;
-using MotorcycleRentalSystem.Domain.Services;
+using MotorcycleRentalSystem.DTO.Responses;
 using MotorcycleRentalSystem.Exceptions;
+using MotorcycleRentalSystem.Domain.Repositories;
 
 namespace MotorcycleRentalSystem.Application.UseCases.RentOrders.Read;
 
-public class ReadRentOrdersUseCase(IRentOrderService rentOrderService, IOptions<AppSettings> appSettings) : IReadRentOrdersUseCase
+public class ReadRentOrdersUseCase(IRentOrderRepository rentOrderRepository, IOptions<AppSettings> appSettings) : IReadRentOrdersUseCase
 {
-    private readonly IRentOrderService _rentOrderService = rentOrderService;
+    private readonly IRentOrderRepository _rentOrderRepository = rentOrderRepository;
     private readonly AppSettings _appSettings = appSettings.Value;
-    private int QUANTITY_MAX => _appSettings.WideQueries?.RentoOrdersMaxEntries ?? 100;
+    private int QUANTITY_MAX => _appSettings.WideQueries?.RentOrdersMaxEntries ?? 100;
     
-    public GetOrdersResponse Execute(UserRoleEnum role, long userId, int offset, int quantity)
+    public async Task<GetOrdersResponse> Execute(UserRoleEnum role, long userId, int offset, int quantity)
     {
         if (quantity == 0 || quantity > QUANTITY_MAX)
             quantity = QUANTITY_MAX;
 
-        var vanillaResults = _rentOrderService.GetAll();
+        var vanillaResults = await _rentOrderRepository.GetAll();
         if (role == UserRoleEnum.RegularRole)
             vanillaResults = vanillaResults.Where(x => x.Deliveryman!.Id == userId);
 
@@ -28,18 +29,18 @@ public class ReadRentOrdersUseCase(IRentOrderService rentOrderService, IOptions<
         var remaining = resultsAfterSkip.Count() - quantity;
         if (remaining < 0)
             remaining = 0;
-        return new (result, remaining, offset, quantity);
+        return new GetOrdersResponseMapper().Map(result, remaining, offset, quantity);
     }
     
-    public GetSelectedOrderResponse Execute(long id)
+    public async Task<GetSelectedOrderResponse> Execute(long id)
     {
-        var order = _rentOrderService.GetById(id);
+        var order = await _rentOrderRepository.GetById(id);
         if (order is null)
             throw new EntityNotFoundException(
                 "The requested order was not found.",
                 typeof(RentOrder), id
             );
 
-        return new ("", order);
+        return new GetSelectedOrderResponseMapper().Map("", order);
     }
 }

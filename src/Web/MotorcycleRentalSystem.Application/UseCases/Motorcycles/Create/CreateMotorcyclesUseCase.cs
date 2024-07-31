@@ -1,16 +1,17 @@
-﻿using MotorcycleRentalSystem.Domain.Entities;
-using MotorcycleRentalSystem.Domain.Requests;
+﻿using MotorcycleRentalSystem.DTO.Requests;
+using MotorcycleRentalSystem.Domain.Entities;
 using MotorcycleRentalSystem.Domain.Services;
 using MotorcycleRentalSystem.Exceptions;
+using MotorcycleRentalSystem.Domain.Repositories;
 
 namespace MotorcycleRentalSystem.Application.UseCases.Motorcycles.Create;
 
-public class CreateMotorcyclesUseCase(IMotorcycleService motorcycleService) : ICreateMotorcyclesUseCase
+public class CreateMotorcyclesUseCase(IMotorcycleRepository motorcycleRepository) : ICreateMotorcyclesUseCase
 {
-    private readonly IMotorcycleService _motorcycleService = motorcycleService;
-    public long Execute(NewMotorcycleRequest request)
+    private readonly IMotorcycleRepository _motorcycleRepository = motorcycleRepository;
+    public async Task<long> Execute(NewMotorcycleRequest request)
     {
-        if (_motorcycleService.GetByLicensePlateNumber(request.LicensePlate!) is not null)
+        if (await _motorcycleRepository.GetByLicensePlateNumber(request.LicensePlate!) is not null)
             throw new FieldValidationFaultException(
                 "The requested license plate is already in use. Pick another one.",
                 "LicensePlate",
@@ -23,7 +24,7 @@ public class CreateMotorcyclesUseCase(IMotorcycleService motorcycleService) : IC
             Model = request.Model,
             LicensePlate = request.LicensePlate
         };
-        _motorcycleService.Add(cycle);
+        await _motorcycleRepository.Add(cycle);
         return cycle.Id;
     }
 }

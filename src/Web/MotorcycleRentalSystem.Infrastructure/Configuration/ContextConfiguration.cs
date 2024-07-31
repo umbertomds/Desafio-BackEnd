@@ -7,14 +7,8 @@ public class ContextConfiguration
 {
     public void SchemaConfiguration(ModelBuilder modelBuilder)
     {
-        // tables
-        modelBuilder.Entity<UserEntityBase>().ToTable("Users");
-        // relations
-        modelBuilder.Entity<DeliverymanUser>().HasOne("DriverLicense");
-        modelBuilder.Entity<RentOrder>().HasOne("RentPlan");
-        modelBuilder.Entity<RentOrder>().HasOne("FinePlan");
         // hierarchy
-        modelBuilder.Entity<UserEntityBase>().UseTphMappingStrategy();
+        modelBuilder.Entity<User>().UseTphMappingStrategy();
 
         // datetime fix
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())

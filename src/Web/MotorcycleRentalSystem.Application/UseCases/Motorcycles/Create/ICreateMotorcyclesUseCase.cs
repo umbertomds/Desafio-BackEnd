@@ -1,7 +1,7 @@
-﻿using MotorcycleRentalSystem.Domain.Requests;
+﻿using MotorcycleRentalSystem.DTO.Requests;
 
 namespace MotorcycleRentalSystem.Application.UseCases.Motorcycles.Create;
 public interface ICreateMotorcyclesUseCase
 {
-    long Execute(NewMotorcycleRequest request);
+    Task<long> Execute(NewMotorcycleRequest request);
 }

@@ -1,22 +1,20 @@
-﻿using MotorcycleRentalSystem.Application.UseCases.RentOrders.Update;
+﻿using MotorcycleRentalSystem.DTO.Requests;
 using MotorcycleRentalSystem.Domain.Entities;
 using MotorcycleRentalSystem.Domain.Enums;
-using MotorcycleRentalSystem.Domain.Requests;
-using MotorcycleRentalSystem.Domain.Responses;
 using MotorcycleRentalSystem.Domain.Services;
 using MotorcycleRentalSystem.Exceptions;
-using System.IO;
+using MotorcycleRentalSystem.Domain.Repositories;
 
 namespace MotorcycleRentalSystem.Application.UseCases.RentOrders.Update;
 
-public class UpdateRentOrdersUseCase(IRentQuoteService rentQuoteService, IRentOrderService rentOrderService) : IUpdateRentOrdersUseCase
+public class UpdateRentOrdersUseCase(IRentQuoteService rentQuoteService, IRentOrderRepository rentOrderRepository) : IUpdateRentOrdersUseCase
 {
     private readonly IRentQuoteService _rentQuoteService = rentQuoteService;
-    private readonly IRentOrderService _rentOrderService = rentOrderService;
+    private readonly IRentOrderRepository _rentOrderRepository = rentOrderRepository;
     
-    public void Execute(UpdateOrderRequest request, long id, long userId)
+    public async Task Execute(UpdateOrderRequest request, long id, long userId)
     {
-        var order = _rentOrderService.GetById(id);
+        var order = await _rentOrderRepository.GetById(id);
         Validate(id, userId, order, request);
 
         var determinedFine = _rentQuoteService.EstimatePlanFine(order!.RentPlan.PlanPeriod, order!.EstimatedEndAt, request.EndAtDate);

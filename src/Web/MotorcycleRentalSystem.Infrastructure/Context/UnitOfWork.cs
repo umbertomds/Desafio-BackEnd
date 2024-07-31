@@ -18,19 +18,18 @@ public class UnitOfWork(AppDbContext dbContext) : IUnitOfWork
         {
             var timestamp = DateTime.UtcNow;
 
-            foreach (var item in _dbContext.ChangeTracker.Entries().OfType<OrdinaryEntityBase>())
+            foreach (var entry in _dbContext.ChangeTracker.Entries())
             {
-                if (item.CreateAt == DateTime.MinValue)
-                    item.CreateAt = timestamp;
-                else
-                    item.ModifiedAt = timestamp;
-            }
-            foreach (var item in _dbContext.ChangeTracker.Entries().OfType<UserEntityBase>())
-            {
-                if (item.CreateAt == DateTime.MinValue)
-                    item.CreateAt = timestamp;
-                else
-                    item.ModifiedAt = timestamp;
+                if (entry.Entity is OrdinaryEntityBase item)
+                    if (item.CreateAt == DateTime.MinValue)
+                        item.CreateAt = timestamp;
+                    else
+                        item.ModifiedAt = timestamp;
+                else if (entry.Entity is User user)
+                    if (user.CreateAt == DateTime.MinValue)
+                        user.CreateAt = timestamp;
+                    else
+                        user.ModifiedAt = timestamp;
             }
         }
     }

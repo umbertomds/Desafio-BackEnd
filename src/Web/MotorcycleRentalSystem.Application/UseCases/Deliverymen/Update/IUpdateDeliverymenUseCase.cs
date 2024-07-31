@@ -1,7 +1,7 @@
-﻿using MotorcycleRentalSystem.Domain.Requests;
+﻿using MotorcycleRentalSystem.DTO.Requests;
 
 namespace MotorcycleRentalSystem.Application.UseCases.Deliverymen.Update;
 public interface IUpdateDeliverymenUseCase
 {
-    void Execute(UpdateDriverLicenseRequest request, long id);
+    Task Execute(UpdateDriverLicenseRequest request, long id);
 }

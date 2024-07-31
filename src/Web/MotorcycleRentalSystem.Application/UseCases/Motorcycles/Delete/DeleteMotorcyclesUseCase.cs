@@ -1,16 +1,16 @@
 ﻿using MotorcycleRentalSystem.Domain.Entities;
-using MotorcycleRentalSystem.Domain.Services;
+using MotorcycleRentalSystem.Domain.Repositories;
 using MotorcycleRentalSystem.Exceptions;
 namespace MotorcycleRentalSystem.Application.UseCases.Motorcycles.Delete;
 
-public class DeleteMotorcyclesUseCase(IMotorcycleService motorcycleService) : IDeleteMotorcyclesUseCase
+public class DeleteMotorcyclesUseCase(IMotorcycleRepository motorcycleRepository) : IDeleteMotorcyclesUseCase
 {
-    private readonly IMotorcycleService _motorcycleService = motorcycleService;
-    public void Execute(long id)
+    private readonly IMotorcycleRepository _motorcycleRepository = motorcycleRepository;
+    public async Task Execute(long id)
     {
-        var cycle = _motorcycleService.GetById(id);
+        var cycle = await _motorcycleRepository.GetById(id);
         Validate(id, cycle);
-        _motorcycleService.Remove(id);
+        await _motorcycleRepository.Remove(id);
     }
 
     private void Validate(long id, Motorcycle? cycle)

@@ -1,14 +1,14 @@
 ﻿using MotorcycleRentalSystem.Domain.Entities;
-using MotorcycleRentalSystem.Domain.Requests;
-using MotorcycleRentalSystem.Domain.Services;
+using MotorcycleRentalSystem.Domain.Repositories;
+using MotorcycleRentalSystem.DTO.Requests;
 namespace MotorcycleRentalSystem.Application.UseCases.Deliverymen.Update;
 
-public class UpdateDeliverymenUseCase(IUserService userService) : IUpdateDeliverymenUseCase
+public class UpdateDeliverymenUseCase(IUserRepository userRepository) : IUpdateDeliverymenUseCase
 {
-    private readonly IUserService _userService = userService;
-    public void Execute(UpdateDriverLicenseRequest request, long id)
+    private readonly IUserRepository _userRepository = userRepository;
+    public async Task Execute(UpdateDriverLicenseRequest request, long id)
     {
-        var user = _userService.GetById(id) as DeliverymanUser;
+        var user = await _userRepository.GetById(id) as DeliverymanUser;
         var license = user?.DriverLicense;
         if (license is not null)
             license.Picture = request.DriverLicensePicture;

@@ -1,14 +1,16 @@
-﻿using MotorcycleRentalSystem.Domain.Entities;
-using MotorcycleRentalSystem.Domain.Requests;
-using MotorcycleRentalSystem.Domain.Services;
+﻿using MotorcycleRentalSystem.DTO.Requests;
+using MotorcycleRentalSystem.Domain.Entities;
+using MotorcycleRentalSystem.Domain.Mappings.In;
 using MotorcycleRentalSystem.Exceptions;
+using MotorcycleRentalSystem.Domain.Repositories;
 
 namespace MotorcycleRentalSystem.Application.UseCases.Deliverymen.Create;
 
-public class CreateDeliverymenUseCase(IUserService userService) : ICreateDeliverymenUseCase
+public class CreateDeliverymenUseCase(IUserRepository userRepository) : ICreateDeliverymenUseCase
 {
-    private readonly IUserService _userService = userService;
-    public long Execute(NewDeliverymanUserRequest request)
+    private readonly ToLicenseTypeEnum licenseTypeEnum = new();
+    private readonly IUserRepository _userRepository = userRepository;
+    public async Task<long> Execute(NewDeliverymanUserRequest request)
     {
         Validate(request);
 
@@ -21,9 +23,9 @@ public class CreateDeliverymenUseCase(IUserService userService) : ICreateDeliver
             Name = request.Name
         };
         user.DriverLicense.Number = request.DriverLicenseNumber;
-        user.DriverLicense.Type = request.DriverLicenseType;
+        user.DriverLicense.Type = licenseTypeEnum.Convert(request.DriverLicenseType);
         user.DriverLicense.Picture = request.DriverLicensePicture;
-        _userService.Add(user);
+        await _userRepository.Add(user);
 
         return user.Id;
     }
@@ -34,19 +36,19 @@ public class CreateDeliverymenUseCase(IUserService userService) : ICreateDeliver
         string field = "";
         string value = "";
 
-        if (_userService.GetByUsername(request.Username!) is not null)
+        if (_userRepository.GetByUsername(request.Username!) is not null)
         {
             mot = "The requested username is already in use. Pick another one.";
             field = "Username";
             value = request.Username!;
         }
-        else if (_userService.GetByCnpj(request.Cnpj!) is not null)
+        else if (_userRepository.GetByCnpj(request.Cnpj!) is not null)
         {
             mot = "The requested CNPJ is already in use. Contact us for further information and next steps.";
             field = "Cnpj";
             value = request.Cnpj!;
         }
-        else if (_userService.GetByLicenseNumber(request.DriverLicenseNumber!) is not null)
+        else if (_userRepository.GetByLicenseNumber(request.DriverLicenseNumber!) is not null)
         {
             mot = "The requested driver license number is already in use. Contact us for further information and next steps.";
             field = "DriverLicenseNumber";

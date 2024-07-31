@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using MotorcycleRentalSystem.DTO.Requests;
 using MotorcycleRentalSystem.Api.Attributes;
-using MotorcycleRentalSystem.Domain.Requests;
 using MotorcycleRentalSystem.Domain.Entities;
-using MotorcycleRentalSystem.Domain.Responses;
+using MotorcycleRentalSystem.DTO.Responses;
 using MotorcycleRentalSystem.Application.UseCases.Deliverymen.Update;
 using MotorcycleRentalSystem.Application.UseCases.Deliverymen.Create;
 using MotorcycleRentalSystem.Exceptions;
@@ -16,12 +16,12 @@ public class DeliverymenController : ControllerBase
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(BadRequestResponse), StatusCodes.Status400BadRequest)]
-    public IActionResult RegisterNew([FromServices] ICreateDeliverymenUseCase useCase, [FromBody] NewDeliverymanUserRequest request)
+    public async Task<IActionResult> RegisterNew([FromServices] ICreateDeliverymenUseCase useCase, [FromBody] NewDeliverymanUserRequest request)
     {
         string path = HttpContext.Request.Path;
         try
         {
-            var createdId = useCase.Execute(request);
+            var createdId = await useCase.Execute(request);
             return Created(path + "/" + createdId.ToString(), new CreatedResponse(createdId));
         }
         catch (FieldValidationFaultException e)
@@ -33,10 +33,10 @@ public class DeliverymenController : ControllerBase
     [RegularAuth]
     [HttpPut]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public IActionResult UpdateDriverLicensePicture([FromServices] IUpdateDeliverymenUseCase useCase, [FromBody] UpdateDriverLicenseRequest request)
+    public async Task<IActionResult> UpdateDriverLicensePicture([FromServices] IUpdateDeliverymenUseCase useCase, [FromBody] UpdateDriverLicenseRequest request)
     {
         var user = (DeliverymanUser)HttpContext.Items["User"]!;
-        useCase.Execute(request, user.Id);
+        await useCase.Execute(request, user.Id);
         return Ok();
     }
 }

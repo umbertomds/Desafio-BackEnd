@@ -1,8 +1,10 @@
 ﻿using MotorcycleRentalSystem.Domain.Enums;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MotorcycleRentalSystem.Domain.Entities;
 
-public class DriverLicense : OrdinaryEntityBase
+[ComplexType]
+public class DriverLicense
 {
     public string? Number { get; set; }
     public LicenseTypeEnum Type { get; set; }
