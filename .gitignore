@@ -13,3 +13,6 @@
 /src/Web/MotorcycleRentalSystem.Domain/obj
 /src/Web/MotorcycleRentalSystem.Infrastructure/bin/Debug/net8.0
 /src/Web/MotorcycleRentalSystem.Infrastructure/obj
+/src/shared/MotorcycleRentalSystem.DataObjects/obj
+/src/shared/MotorcycleRentalSystem.DTO/bin/Debug/net8.0
+/src/shared/MotorcycleRentalSystem.DTO/obj
