@@ -21,6 +21,21 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MotorcycleRentalSystem.Exce
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MotorcycleRentalSystem.DTO", "src\shared\MotorcycleRentalSystem.DTO\MotorcycleRentalSystem.DTO.csproj", "{DB6B04A9-AEF3-4F69-9828-BF3F051F48D6}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{A66AAE4F-2E48-4226-ACB3-423F054894F9}"
+	ProjectSection(SolutionItems) = preProject
+		compose.yaml = compose.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pgadmin", "pgadmin", "{66C9E391-F018-46E5-B0A7-C3C5AFDBCF98}"
+	ProjectSection(SolutionItems) = preProject
+		docker\config\pgadmin\pgpass = docker\config\pgadmin\pgpass
+		docker\config\pgadmin\servers.json = docker\config\pgadmin\servers.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "config", "config", "{68BE8465-8A71-4F52-B5E9-71DADB26628E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "data", "data", "{46AC9AF9-72AE-49CD-9FF1-ECDB99ACAE4F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -64,6 +79,9 @@ Global
 		{B887687D-61C4-4685-AABB-81151293BE83} = {51F16C98-2E06-480B-8C4A-ED9B3A97FAF5}
 		{64C0E022-2E86-40A8-9F05-A8DB11A51D9F} = {B887687D-61C4-4685-AABB-81151293BE83}
 		{DB6B04A9-AEF3-4F69-9828-BF3F051F48D6} = {B887687D-61C4-4685-AABB-81151293BE83}
+		{66C9E391-F018-46E5-B0A7-C3C5AFDBCF98} = {68BE8465-8A71-4F52-B5E9-71DADB26628E}
+		{68BE8465-8A71-4F52-B5E9-71DADB26628E} = {A66AAE4F-2E48-4226-ACB3-423F054894F9}
+		{46AC9AF9-72AE-49CD-9FF1-ECDB99ACAE4F} = {A66AAE4F-2E48-4226-ACB3-423F054894F9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {252B1E4B-B259-47E1-82DC-8332A6759A12}

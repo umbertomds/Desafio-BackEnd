@@ -21,6 +21,11 @@ using MotorcycleRentalSystem.Infrastructure.Repositories;
 using MotorcycleRentalSystem.Domain.Repositories;
 using Microsoft.AspNetCore.Identity;
 using MotorcycleRentalSystem.Domain.Entities;
+using MotorcycleRentalSystem.Infrastructure.Updater;
+using Microsoft.Extensions.Options;
+
+WebApplicationOptions aa;
+aa = new();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -68,7 +73,7 @@ builder.Services.AddSwaggerGen(swagger =>
     swagger.SwaggerDoc("v1", new OpenApiInfo
     {
         Version = "v1",
-        Title = "Motorcyle Rental API",
+        Title = "Motorcycle Rental API",
         Description = ".NET 8 Web API"
     });
     // To Enable authorization using Swagger (JWT)
@@ -101,10 +106,19 @@ builder.Services.AddSwaggerGen(swagger =>
 
 var app = builder.Build();
 
+// post settings after building the app
+var updater = new AppDbContextUpdater();
+var scope = app.Services;
+var dbContext = scope.GetService<AppDbContext>();
+var config = scope.GetService<IOptions<AppSettings>>();
+var cnts = scope.GetService<IOptions<ConnectionStrings>>();
+
+updater.UpdateDatabase(dbContext!, null);
+
 app.UseMiddleware<JwtMiddleware>();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || (config?.Value.UseSwagger ?? false))
 {
     app.UseSwagger();
     app.UseSwaggerUI();

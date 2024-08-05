@@ -23,9 +23,11 @@
       "launchBrowser": true,
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
       "environmentVariables": {
-        "ASPNETCORE_HTTP_PORTS": "8080"
+        "ASPNETCORE_HTTP_PORTS": "5001",
+        "ConnectionStrings__PostgresCNS": "Server=postgres.host.mrs;Port=5432;Database=motorcycle-rental-db;User Id=postgres;Password=postgresPASWD;"
       },
-      "publishAllPorts": true
+      "publishAllPorts": true,
+      "DockerfileRunArguments": "--network proxy-mrs-network"
     }
   },
   "$schema": "http://json.schemastore.org/launchsettings.json",
@@ -33,7 +35,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:46118",
+      "applicationUrl": "http://localhost:5001",
       "sslPort": 0
     }
   }

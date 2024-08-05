@@ -18,7 +18,7 @@ public class ReadMotorcyclesUseCase(IMotorcycleRepository motorcycleRepository, 
     public async Task<GetMotorcyclesResponse> Execute(UserRoleEnum role, int offset, int quantity, AvailabilityFilterEnum availabilityFilter)
     {
         string filter = "";
-
+        
         if (offset < 0)
             offset = 0;
         if (quantity <= 0 || quantity > QUANTITY_MAX)

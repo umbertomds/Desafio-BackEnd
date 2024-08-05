@@ -1,11 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MotorcycleRentalSystem.Domain.Services;
 using MotorcycleRentalSystem.DTO.Responses;
 using MotorcycleRentalSystem.Domain.Enums;
-using System.IO;
 using MotorcycleRentalSystem.Application.UseCases.RentQuotes.Read;
 using MotorcycleRentalSystem.Exceptions;
-using System.Numerics;
+
 
 namespace MotorcycleRentalSystem.Api.Controllers;
 

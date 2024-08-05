@@ -1,0 +1,2 @@
+postgres.host.mrs:5432:postgres:postgres:postgresPASWD
+postgres.host.mrs:5432:motorcycle-rental-db:postgres:postgresPASWD
