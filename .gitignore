@@ -16,3 +16,4 @@
 /src/shared/MotorcycleRentalSystem.DataObjects/obj
 /src/shared/MotorcycleRentalSystem.DTO/bin/Debug/net8.0
 /src/shared/MotorcycleRentalSystem.DTO/obj
+/docker/data/postgres
