@@ -3,13 +3,35 @@ name: motorcycle_rental_system
 networks:
   container-net:
     name: proxy-mrs-network
-    external: false
 
-services:   
+configs:
+  pgadmin_servers_config:
+    content: |
+      {
+        "Servers": {
+          "1": {
+            "Name": "Motorcycle Rental System DB",
+            "Group": "MRS Server Group",
+            "Port": ${POSTGRES_PORT},
+            "Username": "${POSTGRES_USER}",
+            "PassFile": "../../pgpass",
+            "Host": "${POSTGRES_HOSTNAME}",
+            "SSLMode": "prefer",
+            "MaintenanceDB": "${POSTGRES_MAIN_DB}"
+          }
+        }
+      }    
+
+  pgadmin_passfile_config:
+    content: |
+      ${POSTGRES_HOSTNAME}:${POSTGRES_PORT}:${POSTGRES_MAIN_DB}:${POSTGRES_USER}:${POSTGRES_PSWD}
+      ${POSTGRES_HOSTNAME}:${POSTGRES_PORT}:${POSTGRES_APP_DB}:${POSTGRES_USER}:${POSTGRES_PSWD}
+
+services: 
   postgres:
     image: postgres
     container_name: mrs.postgres
-    hostname: postgres.host.mrs
+    hostname: ${POSTGRES_HOSTNAME}
     
     networks:
       - container-net
@@ -19,15 +41,23 @@ services:
       - dev
 
     ports:
-      - "5432:5432"
+      - "${HOST_DB_VIRTUAL_PORT}:${POSTGRES_PORT}"
     
     volumes:
-      - ./docker/data/postgres:/var/lib/postgresql/data
+      - ${HOST_VOLUMES_VIRTUAL_PATH}/data/postgres:/var/lib/postgresql/data
     
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgresPASWD
-      POSTGRES_DB: postgres
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PSWD}
+      POSTGRES_DB: ${POSTGRES_MAIN_DB}
+
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-p", "${POSTGRES_PORT}", "-h", "0.0.0.0", "-d", "${POSTGRES_MAIN_DB}"]
+      interval: 20s
+      timeout: 30s
+      start_period: 45s
+      start_interval: 5s
+      retries: 8
 
   pgadmin:
     image: dpage/pgadmin4
@@ -42,18 +72,23 @@ services:
       - dev
     
     ports:
-      - "5180:80"
+      - "${HOST_PGADM_VIRTUAL_PORT}:${PGADMIN_PORT}"
 
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com.br
-      PGADMIN_DEFAULT_PASSWORD: admin@paswd1234
-    
-    volumes:
-       - ./docker/config/pgadmin/servers.json:/pgadmin4/servers.json
-       - ./docker/config/pgadmin/pgpass:/pgadmin4/pgpass 
-    
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_USER}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PSWD}
+      PGADMIN_LISTEN_PORT: ${PGADMIN_PORT}
+
+    configs:
+      - source: pgadmin_servers_config
+        target: /pgadmin4/servers.json  
+      - source: pgadmin_passfile_config
+        target: /pgadmin4/pgpass
+
     depends_on:
-       - "postgres"
+       postgres:
+         condition: service_healthy
+         required: true
     
     entrypoint: >
       sh -c "
@@ -76,15 +111,19 @@ services:
       context: ./src
       dockerfile: web/MotorcycleRentalSystem.Api/Dockerfile
       args:
-        - "BUILD_CONFIGURATION=Release"
+        - "BUILD_CONFIGURATION=${APP_BUILD_ENV}"
     
     ports:
-      - "5501:5001"
+      - "${HOST_APP_VIRTUAL_PORT}:${APP_PORT}"
     
     depends_on:
-       - "postgres"
-       - "pgadmin"
+       postgres:
+         condition: service_healthy
+         required: true
 
     environment:
-      ConnectionStrings__PostgresCNS: Server=postgres.host.mrs;Port=5432;Database=motorcycle-rental-db;User Id=postgres;Password=postgresPASWD;
-      AppSettings__UseSwagger: true  
+      ConnectionStrings__PostgresCNS: |
+        Server=${POSTGRES_HOSTNAME};Port=${POSTGRES_PORT};Database=${POSTGRES_APP_DB};User Id=${POSTGRES_USER};Password=${POSTGRES_PSWD};
+      Kestrel__Endpoints__MyHttpEndpoint__Url: http://0.0.0.0:${APP_PORT}
+      AppSettings__UseSwagger: ${APP_USE_SWAGGER}
+    
